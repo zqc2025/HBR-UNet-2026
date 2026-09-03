@@ -1,0 +1,14 @@
+HBR-EGE-UNet
+
+This distribution contains code derived from EGE-UNet:
+https://github.com/JCruan519/EGE-UNet
+
+The upstream EGE-UNet source is distributed under the Apache License 2.0.
+A copy of that license is included in LICENSE.
+
+The derivative implementation modifies the upstream model, configuration,
+training loop, evaluation metrics, data loader, and loss implementation. The
+principal additions are the high-level large-kernel (HLLK) block, decoder-stage
+boundary-region refinement (BRR), auxiliary supervision, fixed-threshold
+evaluation, HD95 calculation, early stopping, and safer image-mask validation.
+
