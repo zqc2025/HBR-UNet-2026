@@ -1,4 +1,4 @@
-# PH2 preparation utility for HBR-EGE-UNet. It does not redistribute PH2 data.
+# PH2 preparation utility for HBR-UNet. It does not redistribute PH2 data.
 
 import argparse
 from pathlib import Path

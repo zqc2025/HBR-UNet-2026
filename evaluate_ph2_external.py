@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from datasets.dataset import NPY_datasets
 from engine import _binary_metrics
-from models.egeunet import EGEUNet
+from models.hbr_unet import HBRUNet
 from utils import myNormalize, myResize, myToTensor
 
 
@@ -25,7 +25,7 @@ class PH2Config:
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Evaluate a trusted ISIC-trained HBR-EGE-UNet checkpoint on PH2."
+        description="Evaluate a trusted ISIC-trained HBR-UNet checkpoint on PH2."
     )
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--training-dataset", choices=["isic17", "isic18"], default="isic17")
@@ -39,7 +39,7 @@ def parse_args():
 
 
 def build_model():
-    return EGEUNet(
+    return HBRUNet(
         num_classes=1,
         input_channels=3,
         c_list=[8, 16, 24, 32, 48, 64],
@@ -96,7 +96,7 @@ def evaluate(model, loader, device, threshold):
 
 def write_result(metrics, output_path, training_dataset, samples):
     row = {
-        "model": "HBR-EGE-UNet",
+        "model": "HBR-UNet",
         "training_dataset": training_dataset.upper(),
         "external_test_dataset": "PH2",
         "samples": samples,

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the HBR-UNet manuscript and the original EGE-UNet paper."
+title: "HBR-UNet: High-Level Context Enhancement and Boundary-Region Refinement for Lightweight Skin Lesion Segmentation"
+type: software
+authors:
+  - family-names: Zhang
+    given-names: Qingchun
+  - family-names: Lu
+    given-names: Daying
+  - family-names: Sui
+    given-names: Zongrui
+  - family-names: Wei
+    given-names: Liya
+  - family-names: Zhu
+    given-names: Zhenkun
+repository-code: "https://github.com/zqc2025/HBR-UNet-2026"
+license: Apache-2.0
+keywords:
+  - skin lesion segmentation
+  - lightweight neural network
+  - large-kernel convolution
+  - boundary-region refinement

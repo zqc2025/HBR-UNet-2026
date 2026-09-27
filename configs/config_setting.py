@@ -8,15 +8,22 @@ import os
 from datetime import datetime
 
 
-def _env_bool(name, default):
+def _env_value(name, legacy_name=None):
     value = os.environ.get(name)
+    if value is None and legacy_name is not None:
+        value = os.environ.get(legacy_name)
+    return value
+
+
+def _env_bool(name, default, legacy_name=None):
+    value = _env_value(name, legacy_name)
     if value is None:
         return default
     return value.strip().lower() in ('1', 'true', 'yes', 'y', 'on')
 
 
-def _env_int(name, default):
-    value = os.environ.get(name)
+def _env_int(name, default, legacy_name=None):
+    value = _env_value(name, legacy_name)
     if value is None:
         return default
     return int(value)
@@ -27,21 +34,21 @@ class setting_config:
     the config of training setting.
     """
 
-    network = 'egeunet'
+    network = 'hbr_unet'
     model_config = {
         'num_classes': 1, 
         'input_channels': 3, 
         'c_list': [8,16,24,32,48,64], 
         'bridge': True,
         'gt_ds': True,
-        'use_high_level_large_kernel': _env_bool('EGE_USE_HLLK', True),
-        'hllk_kernel_size': _env_int('EGE_HLLK_KERNEL_SIZE', 7),
-        'use_decoder_brr': _env_bool('EGE_USE_BRR', True),
-        'use_brr_region_branch': _env_bool('EGE_BRR_USE_REGION', True),
-        'use_brr_boundary_branch': _env_bool('EGE_BRR_USE_BOUNDARY', True),
+        'use_high_level_large_kernel': _env_bool('HBR_USE_HLLK', True, 'EGE_USE_HLLK'),
+        'hllk_kernel_size': _env_int('HBR_HLLK_KERNEL_SIZE', 7, 'EGE_HLLK_KERNEL_SIZE'),
+        'use_decoder_brr': _env_bool('HBR_USE_BRR', True, 'EGE_USE_BRR'),
+        'use_brr_region_branch': _env_bool('HBR_BRR_USE_REGION', True, 'EGE_BRR_USE_REGION'),
+        'use_brr_boundary_branch': _env_bool('HBR_BRR_USE_BOUNDARY', True, 'EGE_BRR_USE_BOUNDARY'),
     }
 
-    datasets = os.environ.get('EGE_DATASET', 'isic17')
+    datasets = _env_value('HBR_DATASET', 'EGE_DATASET') or 'isic17'
     if datasets == 'isic18':
         data_path = './data/isic2018/'
     elif datasets == 'isic17':
@@ -58,8 +65,8 @@ class setting_config:
     input_channels = 3
     distributed = False
     local_rank = -1
-    num_workers = _env_int('EGE_NUM_WORKERS', 2)
-    seed = 42
+    num_workers = _env_int('HBR_NUM_WORKERS', 2, 'EGE_NUM_WORKERS')
+    seed = _env_int('HBR_SEED', 42, 'EGE_SEED')
     world_size = None
     rank = None
     amp = False
@@ -67,7 +74,7 @@ class setting_config:
     batch_size = 8
     epochs = 300
 
-    experiment_tag = os.environ.get('EGE_EXPERIMENT_TAG', '').strip()
+    experiment_tag = (_env_value('HBR_EXPERIMENT_TAG', 'EGE_EXPERIMENT_TAG') or '').strip()
     work_dir_tag = '_' + experiment_tag if experiment_tag else ''
     work_dir = 'results/' + network + '_' + datasets + work_dir_tag + '_' + datetime.now().strftime('%A_%d_%B_%Y_%Hh_%Mm_%Ss') + '/'
     results_summary_path = 'results/results_summary.csv'
@@ -78,7 +85,7 @@ class setting_config:
     threshold = 0.55
     save_best_metric = 'dsc'
     early_stop = True
-    early_stop_patience = _env_int('EGE_EARLY_STOP_PATIENCE', 80)
+    early_stop_patience = _env_int('HBR_EARLY_STOP_PATIENCE', 80, 'EGE_EARLY_STOP_PATIENCE')
     early_stop_monitor = 'val_dsc'
     early_stop_mode = 'max'
     early_stop_min_delta = 0.0003

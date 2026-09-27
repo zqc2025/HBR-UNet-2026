@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader
 from datasets.dataset import NPY_datasets
 from tensorboardX import SummaryWriter
-from models.egeunet import EGEUNet
+from models.hbr_unet import HBRUNet
 
 from engine import *
 import os
@@ -145,8 +145,8 @@ def main(config):
 
     print('#----------Prepareing Model----------#')
     model_cfg = config.model_config
-    if config.network == 'egeunet':
-        model = EGEUNet(num_classes=model_cfg['num_classes'], 
+    if config.network in ('hbr_unet', 'egeunet'):
+        model = HBRUNet(num_classes=model_cfg['num_classes'],
                         input_channels=model_cfg['input_channels'], 
                         c_list=model_cfg['c_list'], 
                         bridge=model_cfg['bridge'],
@@ -176,18 +176,18 @@ def main(config):
         if model_cfg.get('use_brr_boundary_branch', True):
             enabled_brr_branches.append('boundary')
         active_modules.append(
-            f"pma_lite_brr_{'_'.join(enabled_brr_branches)}_after_gab3_gab2_gab1"
+            f"brr_{'_'.join(enabled_brr_branches)}_after_gab3_gab2_gab1"
         )
     active_modules.append('bilinear_decoder_upsampling')
     if model_cfg['gt_ds']:
         active_modules.append('gt_deep_supervision')
     gab_log_info = (
         f"model switches: experiment_tag={getattr(config, 'experiment_tag', '') or 'none'}, "
-        f"env_EGE_USE_HLLK={os.environ.get('EGE_USE_HLLK', 'default')}, "
-        f"env_EGE_USE_BRR={os.environ.get('EGE_USE_BRR', 'default')}, "
-        f"env_EGE_HLLK_KERNEL_SIZE={os.environ.get('EGE_HLLK_KERNEL_SIZE', 'default')}, "
-        f"env_EGE_BRR_USE_REGION={os.environ.get('EGE_BRR_USE_REGION', 'default')}, "
-        f"env_EGE_BRR_USE_BOUNDARY={os.environ.get('EGE_BRR_USE_BOUNDARY', 'default')}, "
+        f"env_HBR_USE_HLLK={os.environ.get('HBR_USE_HLLK', os.environ.get('EGE_USE_HLLK', 'default'))}, "
+        f"env_HBR_USE_BRR={os.environ.get('HBR_USE_BRR', os.environ.get('EGE_USE_BRR', 'default'))}, "
+        f"env_HBR_HLLK_KERNEL_SIZE={os.environ.get('HBR_HLLK_KERNEL_SIZE', os.environ.get('EGE_HLLK_KERNEL_SIZE', 'default'))}, "
+        f"env_HBR_BRR_USE_REGION={os.environ.get('HBR_BRR_USE_REGION', os.environ.get('EGE_BRR_USE_REGION', 'default'))}, "
+        f"env_HBR_BRR_USE_BOUNDARY={os.environ.get('HBR_BRR_USE_BOUNDARY', os.environ.get('EGE_BRR_USE_BOUNDARY', 'default'))}, "
         f"bridge={model_cfg['bridge']}, "
         f"gt_ds={model_cfg['gt_ds']}, "
         f"use_high_level_large_kernel={model_cfg.get('use_high_level_large_kernel', False)}, "
